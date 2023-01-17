@@ -8,9 +8,15 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
+  io.emit('server_send_message', 'server: someone connected!')
+
+  socket.on('user_send_message', msg => {
+    io.emit('user_send_message', `user: ${msg}`)
   });
+
+  socket.on('disconnect', () => {
+    io.emit('server_send_message', `server: a user disconnected`)
+  })
 });
 
 http.listen(port, () => {
