@@ -9,6 +9,22 @@ const io = require("socket.io")(http, {
 
 const port = process.env.PORT || 5000;
 
+const randomizeUpdateStatus = () =>
+{
+  const statusChange = [{
+    from: 'open',
+    to: 'in_progress'
+  },{
+    from: 'in_progress',
+    to: 'done'
+  },{
+    from: 'done',
+    to: 'in_progress'
+  }]
+  const randIdx = Math.floor(Math.random() * 3)
+  return statusChange[randIdx]
+}
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
@@ -17,10 +33,8 @@ io.on('connection', (socket) => {
 
   socket.on('server_ticket_updated', () => {
     console.log('server_ticket_updated')
-    return io.sockets.emit('ticket_updated', {
-      from: 'open',
-      to: 'in_progress'
-    })}
+    const status = randomizeUpdateStatus();
+    return io.sockets.emit('ticket_updated', status)}
   );
 
   socket.on('take_ticket', (data, callback) => {
