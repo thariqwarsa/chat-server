@@ -9,54 +9,19 @@ const io = require("socket.io")(http, {
 
 const port = process.env.PORT || 5000;
 
-// app.get('/', (req, res) => {
-//   res.sendFile(__dirname + '/index.html');
-// });
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 
 io.on('connection', (socket) => {
-  socket.on('create_ticket', msg => {
-    console.log('create_ticket')
-    // {
-    //   response: 'success|error'
-    //   error_message: null,
-    //   data: {
-    //     ticket_id: 'x'
-    //   }
-    // }
-  });
 
-  socket.on('send_message', msg => {
-    console.log('send_message')
-    // {
-    //   response: 'success|error'
-    //   error_message: null,
-    //   data: {
-    //     message_id: 'x', 
-    //     status: 'delivered|failed'
-    //   }
-    // }
-  });
-
-  socket.emit('receive_message', msg => {
-    console.log('receive_message')
-  });
-
-  socket.on('take_tikcet', msg => {
-    console.log('take_tikcet')
-    // {
-    //   response: 'success|error'
-    //   error_message: null,
-    //   data: {
-    //     ticket_id: 'xx',
-    //     status: 'in_progress',
-    //     agent_id: 'xx'
-    //   }
-    // }
-  });
-
-  socket.on('ticket_updated', msg => {
-    console.log('ticket_updated')
-  });
+  socket.on('server_ticket_updated', () => {
+    console.log('server_ticket_updated')
+    return io.sockets.emit('ticket_updated', {
+      from: 'open',
+      to: 'in_progress'
+    })}
+  );
 
   socket.on('disconnect', () => {
     io.emit('server_log', `a user disconnected`)
@@ -72,3 +37,9 @@ http.listen(port, () => {
 //   error_message: 'something wrong',
 //   data: null
 // }
+
+// create_ticket ON
+// send_message ON
+// receive_message EMIT
+// take_ticket ON
+// ticket_updated EMIT
