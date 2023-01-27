@@ -25,6 +25,8 @@ const randomizeUpdateStatus = () =>
   return statusChange[randIdx]
 }
 
+const randomizeID = () => Math.floor(Math.random() * 1000)
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
@@ -43,7 +45,7 @@ io.on('connection', (socket) => {
         response: 'success',
         error_message: null,
         data: {
-          ticket_id: data.ticket_id,
+          ticket_id: randomizeID(),
           status: 'in_progress',
           agent_id: data.agent_id
         }
