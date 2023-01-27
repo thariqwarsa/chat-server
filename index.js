@@ -23,6 +23,20 @@ io.on('connection', (socket) => {
     })}
   );
 
+  socket.on('take_ticket', (data, callback) => {
+    console.log('server_take_ticket', data)
+    callback({
+        response: 'success',
+        error_message: null,
+        data: {
+          ticket_id: data.ticket_id,
+          status: 'in_progress',
+          agent_id: data.agent_id
+        }
+      });
+    }
+  );
+
   socket.on('disconnect', () => {
     io.emit('server_log', `a user disconnected`)
   })
