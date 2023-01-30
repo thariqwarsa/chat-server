@@ -66,6 +66,23 @@ io.on('connection', (socket) => {
     return io.sockets.emit('server_send_message', res.message.body)
   })
 
+  socket.on('user_send_message', (msg) => {
+    console.log(msg);
+    return io.sockets.emit('receive_message', {
+      ticket_id: 'T-7117',
+      sender: {
+        id: 'x',
+        name: 'yosy',
+        role: 'dokter'
+      },
+      message: {
+        type: 'text',
+        body: msg,
+      },
+      created_at: '2023:12:12',
+    })
+  })
+
   socket.on('disconnect', () => {
     io.emit('server_log', `a user disconnected`)
   })
