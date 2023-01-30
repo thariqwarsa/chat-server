@@ -53,6 +53,19 @@ io.on('connection', (socket) => {
     }
   );
 
+  socket.on('send_message', (res, callback) => {
+    console.log(res)
+    callback({
+      response: 'success',
+      error_message: null,
+      data: {
+        message_id: res.ticket_id,
+        status: 'delivered'
+      }
+    })
+    return io.sockets.emit('server_send_message', res.message.body)
+  })
+
   socket.on('disconnect', () => {
     io.emit('server_log', `a user disconnected`)
   })
