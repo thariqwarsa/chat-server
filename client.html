@@ -53,18 +53,16 @@
 
       // SECTION: CONNECTED
       socket.on('connect', () => { 
-        console.log(`CLIENT: User ${userId} is connected with socket.id "${socket.id}"`)
+        appendList(`CLIENT: User ${userId} is connected with socket.id "${socket.id}"`)
       })
 
       // SECTION: EMIT SEND_MESSAGE
       const emitSendMessage = (message) => {
-        const payload = {
+        const data = {
           message: input.value,
           sender_id: userId,
         }
-        socket.emit('send_message', payload, (data) => {
-          console.log(payload)
-        });
+        socket.emit('send_message', data);
       }
 
       form.addEventListener('submit', function(e) {
