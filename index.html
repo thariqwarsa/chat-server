@@ -5,7 +5,7 @@
     <style>
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      #user { background-color:bisque; padding: 0.5rem 1rem; font-size: 1.2rem }
+      #user-id { background-color:bisque; padding: 0.5rem 1rem; font-size: 1.2rem }
       #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
@@ -17,7 +17,7 @@
     </style>
   </head>
   <body>
-    <div id="user"></div>
+    <div id="user-id"></div>
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
@@ -25,38 +25,58 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-      const socket = io();
+    
 
       const messages = document.getElementById('messages');
       const form = document.getElementById('form');
       const input = document.getElementById('input');
-      const userLabel = document.getElementById('user')
+      const userLabel = document.getElementById('user-id')
 
       const userId = Math.floor((Math.random() * 999) + 100);
 
       userLabel.textContent = `You are User ${userId}`
-    
-      const handleSendMessage = (message) => {
+
+      // SECTION: HANDSHAKE
+      const socket = io();
+
+      // SECTION: CONNECTED
+      socket.on('connect', () => { 
+        console.log(`User ${userId} is connected with socket.id "${socket.id}"`)
+      })
+
+
+      // SECTION: EMIT SEND_MESSAGE
+      const emitSendMessage = (message) => {
         const payload = {
           message: input.value,
           sender_id: userId,
         }
-        socket.emit('send_message', payload);
+        socket.emit('send_message', payload, emitAcknowledgement);
         input.value = '';
+      }
+
+      const emitAcknowledgement = (payload) => {
+        console.log(payload)
       }
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (!input.value) return
-        handleSendMessage(input.value)
+        emitSendMessage(input.value)
       });
 
-      socket.on('receive_message', function(data) {
+      // SECTION: LISTEN TO RECEIVE_MESSSAGE
+      const handleReceiveMessage = (data) => {
         let item = document.createElement('li');
         item.textContent = `User ${data.sender_id}: ${data.message}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-      });
+      }
+
+      socket.on('receive_message', handleReceiveMessage);
+
+
+      
     </script>
   </body>
 </html>
