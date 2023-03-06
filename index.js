@@ -8,6 +8,13 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+  const userId = socket.handshake.headers.user_id
+  
+  io.emit('user_connected', {
+    sender_id: 'SERVER',
+    message: `User ${userId} is connected!`
+  });
+  
   socket.on('send_message', data => {
     io.emit('receive_message', data);
   });

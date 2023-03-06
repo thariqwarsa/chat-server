@@ -36,14 +36,25 @@
 
       userLabel.textContent = `You are User ${userId}`
 
+      const appendList = (message) => {
+        let item = document.createElement('li');
+        item.textContent = message;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+
       // SECTION: HANDSHAKE
-      const socket = io();
+      const socket = io('', {
+        extraHeaders: {
+          user_id: userId,
+          // authorizarion: '7592472304719'
+        }
+      });
 
       // SECTION: CONNECTED
       socket.on('connect', () => { 
-        console.log(`User ${userId} is connected with socket.id "${socket.id}"`)
+        console.log(`CLIENT: User ${userId} is connected with socket.id "${socket.id}"`)
       })
-
 
       // SECTION: EMIT SEND_MESSAGE
       const emitSendMessage = (message) => {
@@ -51,32 +62,31 @@
           message: input.value,
           sender_id: userId,
         }
-        socket.emit('send_message', payload, emitAcknowledgement);
-        input.value = '';
-      }
-
-      const emitAcknowledgement = (payload) => {
-        console.log(payload)
+        socket.emit('send_message', payload, (data) => {
+          console.log(payload)
+        });
       }
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (!input.value) return
         emitSendMessage(input.value)
+        input.value = '';
       });
 
       // SECTION: LISTEN TO RECEIVE_MESSSAGE
-      const handleReceiveMessage = (data) => {
-        let item = document.createElement('li');
-        item.textContent = `User ${data.sender_id}: ${data.message}`;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
-      }
 
-      socket.on('receive_message', handleReceiveMessage);
+      socket.on('receive_message', (data) => {
+        const message = `User ${data.sender_id}: ${data.message}`;
+        appendList(message)
+      });
 
+      // SECTION: LISTEN TO USER CONNECTED
+      socket.on('user_connected', (data) => {
+        const message = `${data.sender_id}: ${data.message}`;
+        appendList(message)
+      });
 
-      
     </script>
   </body>
 </html>
